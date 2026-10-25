@@ -121,6 +121,7 @@ export default function App() {
 
   // ── Deal State Machine ───────────────────────────────────────────────────────
   const [dealState, dispatch] = useReducer(dealReducer, initialDealState);
+  const isNegotiationOpen = dealState.status !== DEAL_STATES.IDLE;
 
   // Sync completed deal into persistent list
   useEffect(() => {
@@ -244,7 +245,6 @@ export default function App() {
   };
 
   const empty = filteredGigs.length === 0;
-  const isNegotiationOpen = dealState.status !== DEAL_STATES.IDLE;
   const hasActiveFilter = selectedSkills.length > 0 || !!selectedCategory;
   const totalUnswiped = gigs.filter((g) => !swipedIds.has(g.id)).length;
 
