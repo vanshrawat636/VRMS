@@ -9,6 +9,7 @@ import NegotiationModal from "./components/NegotiationModal.jsx";
 import ProfileView from "./components/ProfileView.jsx";
 import SkillFilterBar from "./components/SkillFilterBar.jsx";
 import LandingPage from "./components/LandingPage.jsx";
+import { useWallet } from "./hooks/useWallet.js";
 import { MOCK_GIGS, ALL_SKILLS } from "./data/gigs.js";
 import { track } from "./utils/analytics.js";
 import {
@@ -21,6 +22,9 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export default function App() {
+  // ── Web3 MetaMask Wallet ───────────────────────────────────────────────────
+  const wallet = useWallet();
+
   // ── Auth State ───────────────────────────────────────────────────────────────
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("sg_user")); } catch { return null; }
@@ -213,6 +217,7 @@ export default function App() {
         currentView={currentView}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onToggleProfile={(view) => setCurrentView(view)}
+        wallet={wallet}
       />
 
       {/* ── Main View Router ──────────────────────────────────────────────────── */}
@@ -355,6 +360,7 @@ export default function App() {
         onLogout={handleLogout}
         user={user}
         role={role}
+        wallet={wallet}
       />
 
       {/* ── Full-Screen Negotiation & Escrow Modal ────────────────────────────── */}

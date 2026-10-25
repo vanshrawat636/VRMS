@@ -14,154 +14,239 @@ const GOOGLE_ICON = (
 const roles = [
   {
     id: "client",
-    emoji: "??",
-    title: "I'm a Client",
-    subtitle: "Post gigs & hire talent",
-    desc: "Swipe through skilled freelancers, let your AI agent negotiate the best price, and lock payment in a smart contract escrow.",
+    emoji: "💼",
+    title: "1. Client",
+    subtitle: "Hire Talent & Fund Escrows",
+    desc: "Post gigs, browse top Web3 & AI freelancers, let your personal AI negotiate optimal rates, and deposit funds securely into smart contract escrow.",
     gradient: "from-violet-600/20 to-indigo-600/20",
     border: "border-violet-500/40",
     glow: "shadow-violet-500/20",
-    active: "border-violet-400 bg-violet-500/10",
+    active: "border-violet-400 bg-violet-500/15 ring-2 ring-violet-500/40",
     pill: "bg-violet-500/20 text-violet-300",
   },
   {
     id: "freelancer",
-    emoji: "??",
-    title: "I'm a Freelancer",
-    subtitle: "Find work & get paid on-chain",
-    desc: "Discover client gigs that match your skills, negotiate hands-free via AI, and earn Soulbound Tokens as verifiable reputation.",
+    emoji: "⚡",
+    title: "2. Freelancing",
+    subtitle: "Find Work & Earn Reputation",
+    desc: "Swipe right on high-paying gigs, negotiate contracts autonomously via AI agents, get paid directly on-chain, and mint permanent Soulbound reputation tokens.",
     gradient: "from-cyan-600/20 to-teal-600/20",
     border: "border-cyan-500/40",
     glow: "shadow-cyan-500/20",
-    active: "border-cyan-400 bg-cyan-500/10",
+    active: "border-cyan-400 bg-cyan-500/15 ring-2 ring-cyan-500/40",
     pill: "bg-cyan-500/20 text-cyan-300",
   },
 ];
 
 export default function LandingPage({ onEnter }) {
   const [selectedRole, setSelectedRole] = useState(null);
-  const [step, setStep] = useState("role");
+  const [step, setStep] = useState("role"); // "role" | "auth"
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  const [customName, setCustomName] = useState("");
+
+  const handleSelectRole = (rId) => {
+    setSelectedRole(rId);
+    setStep("auth");
+  };
 
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
     setTimeout(() => {
+      const isClient = selectedRole === "client";
       const mockUser = {
-        name: "Vansh Rawat",
-        email: "vansh@example.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=swipegig",
+        name: isClient ? "Alex Chen (Client)" : "Sarah Vance (Freelancer)",
+        email: isClient ? "alex.chen@client.ai" : "sarah.dev@freelance.eth",
+        avatar: isClient
+          ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
+          : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",
+        provider: "google",
         role: selectedRole,
       };
       localStorage.setItem("sg_user", JSON.stringify(mockUser));
       localStorage.setItem("sg_role", selectedRole);
       setIsGoogleLoading(false);
-      setDone(true);
-      setTimeout(() => onEnter(mockUser, selectedRole), 900);
-    }, 1400);
+      onEnter(mockUser, selectedRole);
+    }, 700);
   };
 
-  const handleSkip = () => {
-    const guestUser = { name: "Guest", role: selectedRole, guest: true };
+  const handleQuickDemo = () => {
+    const isClient = selectedRole === "client";
+    const name = customName.trim() || (isClient ? "Demo Client" : "Demo Freelancer");
+    const demoUser = {
+      name,
+      email: `${name.toLowerCase().replace(/\s+/g, ".")}@swipegig.xyz`,
+      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`,
+      provider: "demo",
+      role: selectedRole,
+    };
+    localStorage.setItem("sg_user", JSON.stringify(demoUser));
     localStorage.setItem("sg_role", selectedRole);
-    onEnter(guestUser, selectedRole);
+    onEnter(demoUser, selectedRole);
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-auto bg-ink-950 px-4 py-10">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[80px]" />
-        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-cyan-600/15 blur-[80px]" />
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950 p-4 sm:p-6 overflow-y-auto">
+      {/* Background ambient lighting */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[600px] rounded-full bg-accent/15 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 left-1/4 h-[400px] w-[500px] rounded-full bg-cyan-600/10 blur-[140px]" />
 
-      <AnimatePresence mode="wait">
-        {step === "role" && (
-          <motion.div key="role" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} transition={{ duration: 0.35 }} className="relative w-full max-w-lg">
-            <div className="mb-8 text-center">
-              <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: "spring", stiffness: 260 }} className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 text-3xl shadow-2xl shadow-violet-500/30">
-                ?
-              </motion.div>
-              <motion.h1 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                Welcome to{" "}
-                <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">SwipeGig</span>
-              </motion.h1>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="mt-2 text-sm text-zinc-400">
-                The world's first AI-negotiated, Web3-secured freelance marketplace.
-              </motion.p>
-            </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="relative w-full max-w-lg rounded-3xl border border-white/10 bg-ink-900/90 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl"
+      >
+        {/* Brand Header */}
+        <div className="text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-accent to-pink-500 shadow-lg shadow-accent/30 text-white font-black text-2xl">
+            S
+          </div>
+          <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Welcome to Swipe<span className="text-accent-soft">Gig</span>
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-400">
+            Tinder-style matching · AI negotiation · Web3 smart contract escrows
+          </p>
+        </div>
 
-            <p className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-500">Choose your role to get started</p>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {roles.map((r, i) => (
-                <motion.button key={r.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }} onClick={() => setSelectedRole(r.id)} className={`group relative flex flex-col items-start gap-2 overflow-hidden rounded-2xl border p-5 text-left transition-all duration-200 ${selectedRole === r.id ? r.active + " shadow-xl " + r.glow : "border-white/10 bg-ink-900/60 hover:border-white/20 hover:bg-ink-800/60"}`}>
-                  <div className={`absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-0 transition-opacity group-hover:opacity-100 ${selectedRole === r.id ? "!opacity-100" : ""}`} />
-                  <div className="relative">
-                    <div className="text-3xl">{r.emoji}</div>
-                    <div className="mt-2 font-bold text-white">{r.title}</div>
-                    <div className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${r.pill}`}>{r.subtitle}</div>
-                    <p className="mt-2 text-xs leading-relaxed text-zinc-400">{r.desc}</p>
-                  </div>
-                  {selectedRole === r.id && (
-                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white text-xs">?</div>
-                  )}
-                </motion.button>
-              ))}
-            </div>
-
-            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} onClick={() => selectedRole && setStep("login")} disabled={!selectedRole} className={`mt-5 w-full rounded-full py-3.5 text-sm font-bold transition-all duration-200 ${selectedRole ? "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-[1.02]" : "cursor-not-allowed bg-ink-800 text-zinc-600"}`}>
-              Continue ?
-            </motion.button>
-          </motion.div>
-        )}
-
-        {step === "login" && (
-          <motion.div key="login" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} transition={{ duration: 0.35 }} className="relative w-full max-w-sm">
-            <button onClick={() => setStep("role")} className="mb-6 flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white">? Back</button>
-
-            <div className="rounded-3xl border border-white/10 bg-ink-900/80 p-8 shadow-2xl backdrop-blur-xl">
+        {/* Stepper Views */}
+        <AnimatePresence mode="wait">
+          {step === "role" ? (
+            <motion.div
+              key="step-role"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+              className="mt-6 flex flex-col gap-4"
+            >
               <div className="text-center">
-                <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 text-2xl">
-                  {roles.find((r) => r.id === selectedRole)?.emoji}
-                </div>
-                <h2 className="text-xl font-bold text-white">
-                  Sign in as a{" "}
-                  <span className="capitalize bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">{selectedRole}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-zinc-300">
+                  Step 1 of 2: Select Your Profile
+                </span>
+                <h2 className="mt-2 text-sm font-semibold text-zinc-200">
+                  How would you like to use SwipeGig?
                 </h2>
-                <p className="mt-1.5 text-xs text-zinc-400">Your data stays private. Payments secured by smart contracts.</p>
               </div>
 
-              <div className="mt-7 space-y-3">
-                <button onClick={handleGoogleLogin} disabled={isGoogleLoading || done} id="btn-google-login" className={`flex w-full items-center justify-center gap-3 rounded-full border py-3.5 text-sm font-semibold transition-all duration-200 ${done ? "border-green-500/40 bg-green-500/10 text-green-400" : "border-white/15 bg-white text-zinc-800 hover:bg-zinc-100 hover:shadow-lg"}`}>
+              {/* 2 Options: Client and Freelancing */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mt-2">
+                {roles.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => handleSelectRole(r.id)}
+                    className={`group relative flex flex-col items-start rounded-2xl border p-4 text-left transition duration-200 hover:scale-[1.02] ${r.border} bg-gradient-to-b ${r.gradient} hover:border-white/40 shadow-lg`}
+                  >
+                    <div className="flex w-full items-center justify-between">
+                      <span className="text-3xl">{r.emoji}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${r.pill}`}>
+                        {r.id === "client" ? "Option 1" : "Option 2"}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 text-base font-bold text-white group-hover:text-accent-soft transition">
+                      {r.title}
+                    </h3>
+                    <p className="text-xs font-semibold text-zinc-300">
+                      {r.subtitle}
+                    </p>
+                    <p className="mt-2 text-[11px] text-zinc-400 leading-relaxed">
+                      {r.desc}
+                    </p>
+
+                    <div className="mt-4 flex w-full items-center justify-between text-xs font-semibold text-accent-soft group-hover:translate-x-1 transition duration-150">
+                      <span>Choose {r.id === "client" ? "Client" : "Freelancing"}</span>
+                      <span>→</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="step-auth"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+              className="mt-6 flex flex-col gap-4"
+            >
+              {/* Back to role selector button */}
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setStep("role")}
+                  className="flex items-center gap-1 text-xs text-zinc-400 hover:text-white transition"
+                >
+                  ← Back to role choice
+                </button>
+                <span className="rounded-full bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent-soft uppercase">
+                  {selectedRole === "client" ? "💼 Client Mode" : "⚡ Freelancing Mode"}
+                </span>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-ink-950/60 p-5 text-center">
+                <h2 className="text-base font-bold text-white">Sign In to Continue</h2>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Save your swipes, negotiate with AI agents, and manage on-chain escrows.
+                </p>
+
+                {/* Google Sign In Button */}
+                <button
+                  onClick={handleGoogleLogin}
+                  disabled={isGoogleLoading}
+                  id="btn-google-login"
+                  className="mt-5 flex w-full items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-bold text-zinc-900 shadow-xl transition hover:bg-zinc-100 hover:shadow-2xl active:scale-[0.99] disabled:opacity-60"
+                >
                   {isGoogleLoading ? (
-                    <><svg className="h-4 w-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg><span className="text-zinc-600">Signing in�</span></>
-                  ) : done ? (
-                    <>? <span>Signed in � entering app�</span></>
+                    <div className="flex items-center gap-2">
+                      <svg className="h-4 w-4 animate-spin text-zinc-900" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      <span>Signing in with Google...</span>
+                    </div>
                   ) : (
-                    <>{GOOGLE_ICON}<span>Continue with Google</span></>
+                    <>
+                      {GOOGLE_ICON}
+                      <span>Continue with Google</span>
+                    </>
                   )}
                 </button>
 
-                <div className="flex items-center gap-3">
+                {/* Divider */}
+                <div className="my-4 flex items-center gap-3 text-xs text-zinc-500">
                   <div className="h-px flex-1 bg-white/10" />
-                  <span className="text-[10px] font-medium text-zinc-600">or</span>
+                  <span>or enter as guest demo</span>
                   <div className="h-px flex-1 bg-white/10" />
                 </div>
 
-                <button onClick={handleSkip} id="btn-skip-login" className="w-full rounded-full border border-white/10 py-3 text-xs font-semibold text-zinc-400 transition hover:border-white/20 hover:text-white">
-                  Continue as Guest (no account)
-                </button>
+                {/* Custom Name / Quick Demo */}
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    placeholder={selectedRole === "client" ? "Enter Client Name (Optional)" : "Enter Freelancer Handle (Optional)"}
+                    className="w-full rounded-xl border border-white/10 bg-ink-900 px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:border-accent focus:outline-none"
+                    onKeyDown={(e) => e.key === "Enter" && handleQuickDemo()}
+                  />
+                  <button
+                    onClick={handleQuickDemo}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-ink-800 py-2.5 text-xs font-semibold text-zinc-200 transition hover:bg-ink-700 hover:text-white"
+                  >
+                    🚀 Enter Instantly ({selectedRole === "client" ? "Client" : "Freelancer"})
+                  </button>
+                </div>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <div className="mt-6 flex justify-center gap-4 text-[10px] text-zinc-600">
-                <span>?? Zero-knowledge budget</span>
-                <span>? On-chain escrow</span>
-                <span>?? SBT reputation</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Footer info */}
+        <p className="mt-6 text-center text-[11px] text-zinc-500">
+          By entering, you agree to decentralized escrow settlement & AI negotiation terms.
+        </p>
+      </motion.div>
     </div>
   );
 }

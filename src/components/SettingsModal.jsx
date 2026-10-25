@@ -1,8 +1,18 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StarterManual from "./StarterManual.jsx";
+import WalletButton from "./WalletButton.jsx";
 
-export default function SettingsModal({ isOpen, onClose, budget, onSave, onLogout, user, role }) {
+export default function SettingsModal({
+  isOpen,
+  onClose,
+  budget,
+  onSave,
+  onLogout,
+  user,
+  role,
+  wallet,
+}) {
   const [showManual, setShowManual] = useState(false);
   const [min, setMin] = useState(budget.min);
   const [max, setMax] = useState(budget.max);
@@ -17,6 +27,7 @@ export default function SettingsModal({ isOpen, onClose, budget, onSave, onLogou
       setMinError("");
       setMaxError("");
       setGeneralError("");
+      setShowManual(false);
     }
   }, [isOpen, budget]);
 
@@ -127,253 +138,270 @@ export default function SettingsModal({ isOpen, onClose, budget, onSave, onLogou
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-ink-900/95 p-6 shadow-2xl backdrop-blur-xl sm:p-7"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-ink-900/95 p-6 shadow-2xl backdrop-blur-xl sm:p-7"
           >
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/20 text-accent-soft">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
+            {showManual ? (
+              <StarterManual onClose={() => setShowManual(false)} />
+            ) : (
+              <>
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/20 text-accent-soft">
+                        ⚙️
+                      </div>
+                      <h3 className="text-lg font-bold text-white">Settings</h3>
+                    </div>
+                    <p className="mt-1 text-xs text-zinc-400">
+                      Agent budget · Starter Manual · Web3 & Account
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-white">Settings</h3>
-                </div>
-                <p className="mt-1 text-xs text-zinc-400">
-                  Agent budget · Starter Manual · Account
-                </p>
-              </div>
 
-              <button
-                onClick={onClose}
-                className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:bg-white/10 hover:text-white"
-                aria-label="Close settings"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* User / Role Badge */}
-            {user && (
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-ink-950/60 p-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 text-sm font-bold text-white">
-                  {user.name ? user.name[0].toUpperCase() : "G"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="truncate text-xs font-semibold text-white">{user.name || "Guest"}</div>
-                  <div className="text-[10px] text-zinc-500 capitalize">{role || "guest"} account</div>
-                </div>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
-                  role === "client" ? "bg-violet-500/20 text-violet-300" : "bg-cyan-500/20 text-cyan-300"
-                }`}>{role || "guest"}</span>
-              </div>
-            )}
-
-            {/* Confidentiality Pill */}
-            <div className="mt-3 flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/10 p-3 text-xs text-violet-300">
-              <span className="text-base">🔒</span>
-              <span>
-                <strong>Zero-Knowledge Budget:</strong> These numbers are never shown on your profile
-                or cards. Only your local AI agent knows them.
-              </span>
-            </div>
-
-            <form onSubmit={handleSave} className="mt-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Hidden Minimum Floor (USDC)
-                </label>
-                <div
-                  className={`mt-1.5 relative rounded-xl border bg-ink-950 focus-within:border-accent ${
-                    minError ? "border-rose-500/50" : "border-white/10"
-                  }`}
-                >
-                  <input
-                    type="number"
-                    step="50"
-                    min="1"
-                    value={min}
-                    onChange={(e) => handleMinChange(e.target.value)}
-                    className="w-full bg-transparent px-4 py-2.5 font-mono text-sm text-white placeholder-zinc-600 focus:outline-none"
-                    placeholder="1000"
-                  />
-                  <span className="absolute right-3.5 top-2.5 font-mono text-xs text-zinc-500">
-                    USDC
-                  </span>
-                </div>
-                {minError ? (
-                  <p className="mt-1 text-[11px] font-medium text-rose-400">{minError}</p>
-                ) : (
-                  <p className="mt-1 text-[11px] text-zinc-500">
-                    Your AI will strictly decline any deal below this amount.
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Hidden Maximum Target (USDC)
-                </label>
-                <div
-                  className={`mt-1.5 relative rounded-xl border bg-ink-950 focus-within:border-accent ${
-                    maxError ? "border-rose-500/50" : "border-white/10"
-                  }`}
-                >
-                  <input
-                    type="number"
-                    step="50"
-                    min="1"
-                    value={max}
-                    onChange={(e) => handleMaxChange(e.target.value)}
-                    className="w-full bg-transparent px-4 py-2.5 font-mono text-sm text-white placeholder-zinc-600 focus:outline-none"
-                    placeholder="3000"
-                  />
-                  <span className="absolute right-3.5 top-2.5 font-mono text-xs text-zinc-500">
-                    USDC
-                  </span>
-                </div>
-                {maxError ? (
-                  <p className="mt-1 text-[11px] font-medium text-rose-400">{maxError}</p>
-                ) : (
-                  <p className="mt-1 text-[11px] text-zinc-500">
-                    Your AI will open negotiations anchoring near this upper target.
-                  </p>
-                )}
-              </div>
-
-              {/* Quick Presets */}
-              <div>
-                <span className="text-[11px] font-medium text-zinc-500">Quick Presets:</span>
-                <div className="mt-1.5 flex flex-wrap gap-2">
                   <button
-                    type="button"
-                    onClick={() => {
-                      setMin(800);
-                      setMax(2000);
-                      setMinError("");
-                      setMaxError("");
-                      setGeneralError("");
-                    }}
-                    className="min-h-[44px] rounded-lg border border-white/5 bg-ink-800 px-3 py-2 text-xs text-zinc-300 transition hover:border-accent/40 hover:bg-ink-700"
-                  >
-                    $800 - $2,000
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMin(1000);
-                      setMax(3000);
-                      setMinError("");
-                      setMaxError("");
-                      setGeneralError("");
-                    }}
-                    className="min-h-[44px] rounded-lg border border-white/5 bg-ink-800 px-3 py-2 text-xs text-zinc-300 transition hover:border-accent/40 hover:bg-ink-700"
-                  >
-                    $1,000 - $3,000 (Default)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMin(2000);
-                      setMax(4500);
-                      setMinError("");
-                      setMaxError("");
-                      setGeneralError("");
-                    }}
-                    className="min-h-[44px] rounded-lg border border-white/5 bg-ink-800 px-3 py-2 text-xs text-zinc-300 transition hover:border-accent/40 hover:bg-ink-700"
-                  >
-                    $2,000 - $4,500
-                  </button>
-                </div>
-              </div>
-
-              {generalError && (
-                <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3.5 py-2.5 text-xs font-medium text-rose-400">
-                  ⚠️ {generalError}
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="mt-6 flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="min-h-[44px] text-xs text-zinc-400 underline-offset-4 hover:text-white hover:underline"
-                >
-                  Reset defaults
-                </button>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
                     onClick={onClose}
-                    className="min-h-[44px] rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/5"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+                    aria-label="Close settings"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="min-h-[44px] rounded-full bg-accent px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft"
-                  >
-                    Save Changes
+                    ✕
                   </button>
                 </div>
-              </div>
-            </form>
 
-            {/* ── Starter Manual ─────────────────────────────────────────────── */}
-            <div className="mt-5">
-              <button
-                type="button"
-                onClick={() => setShowManual((v) => !v)}
-                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-ink-950/50 px-4 py-3 text-left transition hover:bg-ink-800/60"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-base">📖</span>
-                  <span className="text-xs font-semibold text-white">Starter Manual</span>
-                  <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-semibold text-accent-soft">How it works</span>
-                </div>
-                <span className={`text-zinc-500 text-xs transition-transform duration-200 ${showManual ? "rotate-180" : ""}`}>▼</span>
-              </button>
-              <AnimatePresence>
-                {showManual && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden"
-                  >
-                    <StarterManual onClose={() => { setShowManual(false); onClose(); }} />
-                  </motion.div>
+                {/* Account / User Card */}
+                {user && (
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-ink-950/60 p-3.5">
+                    <div className="flex items-center gap-3">
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
+                          className="h-10 w-10 rounded-full border border-white/20 object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white font-bold text-sm">
+                          {user.name?.charAt(0) || "U"}
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-white">{user.name}</span>
+                          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent-soft uppercase">
+                            {role === "client" ? "Client" : "Freelancer"}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-zinc-400">{user.email}</span>
+                      </div>
+                    </div>
+
+                    {/* Logout Button */}
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        onClose();
+                      }}
+                      id="btn-logout"
+                      className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20 hover:text-rose-200"
+                      title="Log out of current session"
+                    >
+                      Log out
+                    </button>
+                  </div>
                 )}
-              </AnimatePresence>
-            </div>
 
-            {/* ── Logout ─────────────────────────────────────────────────────── */}
-            {onLogout && (
-              <div className="mt-4 border-t border-white/5 pt-4">
-                <button
-                  type="button"
-                  onClick={() => { onLogout(); onClose(); }}
-                  id="btn-logout"
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-rose-500/20 bg-rose-500/10 py-2.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20 hover:text-rose-300"
-                >
-                  🚪 Sign Out
-                </button>
-              </div>
+                {/* Starter Manual Card Promo */}
+                <div className="mt-4 rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/15 to-purple-600/15 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-2xl">📖</span>
+                      <div>
+                        <h4 className="text-xs font-bold text-white">Starter Manual</h4>
+                        <p className="text-[11px] text-zinc-400">
+                          Interactive walkthrough of Tinder swiping, AI negotiation & escrows
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowManual(true)}
+                      id="btn-open-starter-manual"
+                      className="rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-accent/20 transition hover:bg-accent-soft shrink-0"
+                    >
+                      Open Guide
+                    </button>
+                  </div>
+                </div>
+
+                {/* Web3 / MetaMask Wallet Section */}
+                <div className="mt-4 rounded-2xl border border-white/10 bg-ink-950/60 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-white">MetaMask Wallet</span>
+                        {wallet?.address && (
+                          <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-400">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-zinc-400">
+                        {wallet?.address
+                          ? `${wallet.shortAddress} · ${wallet.balance || "0"} ETH`
+                          : "Connect your Web3 wallet for smart contract escrow"}
+                      </p>
+                    </div>
+                    {wallet && <WalletButton wallet={wallet} />}
+                  </div>
+                </div>
+
+                {/* Form: Hidden AI Budget */}
+                <form onSubmit={handleSave} className="mt-4 flex flex-col gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-white">Private AI Negotiation Budget</span>
+                    <p className="mt-0.5 text-[11px] text-zinc-400">
+                      Your autonomous agent uses this range to make counter-offers without revealing your limit.
+                    </p>
+                  </div>
+
+                  {/* Min Budget Field */}
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor="min-budget"
+                      className="flex items-center justify-between text-xs font-medium text-zinc-300"
+                    >
+                      <span>Minimum Floor (Acceptable)</span>
+                      <span className="font-mono text-xs text-accent-soft">USDC</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-500">
+                        $
+                      </span>
+                      <input
+                        id="min-budget"
+                        type="number"
+                        min="1"
+                        max="1000000"
+                        step="50"
+                        value={min}
+                        onChange={(e) => handleMinChange(e.target.value)}
+                        className={`w-full rounded-xl border bg-ink-950/80 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
+                          minError || generalError
+                            ? "border-rose-500/80 focus:border-rose-400"
+                            : "border-white/10 focus:border-accent"
+                        }`}
+                        placeholder="e.g. 1000"
+                      />
+                    </div>
+                    {minError && (
+                      <p className="text-[11px] font-medium text-rose-400">{minError}</p>
+                    )}
+                  </div>
+
+                  {/* Max Budget Field */}
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor="max-budget"
+                      className="flex items-center justify-between text-xs font-medium text-zinc-300"
+                    >
+                      <span>Maximum Target (Ceiling)</span>
+                      <span className="font-mono text-xs text-accent-soft">USDC</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-500">
+                        $
+                      </span>
+                      <input
+                        id="max-budget"
+                        type="number"
+                        min="1"
+                        max="1000000"
+                        step="50"
+                        value={max}
+                        onChange={(e) => handleMaxChange(e.target.value)}
+                        className={`w-full rounded-xl border bg-ink-950/80 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
+                          maxError || generalError
+                            ? "border-rose-500/80 focus:border-rose-400"
+                            : "border-white/10 focus:border-accent"
+                        }`}
+                        placeholder="e.g. 3000"
+                      />
+                    </div>
+                    {maxError && (
+                      <p className="text-[11px] font-medium text-rose-400">{maxError}</p>
+                    )}
+                  </div>
+
+                  {/* Cross-field validation error */}
+                  {generalError && (
+                    <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-2.5 text-[11px] font-medium text-rose-400">
+                      {generalError}
+                    </div>
+                  )}
+
+                  {/* Quick Preset Buttons */}
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                      Quick Presets
+                    </span>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMin(500);
+                          setMax(1500);
+                        }}
+                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                      >
+                        $500 – $1.5k
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMin(1000);
+                          setMax(3000);
+                        }}
+                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                      >
+                        $1k – $3k
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMin(3000);
+                          setMax(8000);
+                        }}
+                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                      >
+                        $3k – $8k
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="mt-2 flex items-center justify-between gap-3 pt-3 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      Reset Defaults
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="rounded-xl bg-accent px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft active:scale-[0.98]"
+                      >
+                        Save Settings
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </>
             )}
           </motion.div>
         </div>

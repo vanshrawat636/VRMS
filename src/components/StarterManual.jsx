@@ -3,128 +3,198 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const steps = [
   {
-    icon: "??",
-    title: "Pick Your Role",
+    icon: "👥",
+    title: "1. Choose Your Role",
     color: "from-violet-500 to-indigo-500",
     badge: "Step 1",
-    content: "On first launch you chose either Client or Freelancer. This shapes which gigs you see and how your AI agent behaves. You can change your role anytime from Settings.",
+    tagline: "Client or Freelancer",
+    content:
+      "When you first launch SwipeGig, pick whether you are hiring talent (Client) or finding work (Freelancer). Your role tailors the feed, negotiation prompts, and wallet escrow actions.",
+    details: [
+      "Clients post gig bounties and lock payment in escrow.",
+      "Freelancers swipe right on jobs and earn Soulbound reputation tokens upon delivery.",
+      "Switch roles anytime from Settings.",
+    ],
   },
   {
-    icon: "??",
-    title: "Swipe the Feed",
+    icon: "🔥",
+    title: "2. Tinder-Style Swiping",
     color: "from-cyan-500 to-teal-500",
     badge: "Step 2",
-    content: "Cards represent gigs or talent. Swipe RIGHT (or tap ?) to express interest. Swipe LEFT (or tap ?) to skip. Use the skill tags at the top to filter by category.",
+    tagline: "Fast & intuitive matchmaking",
+    content:
+      "Replace tedious cover letters and 10-page resumes. Swipe through interactive cards with key deliverables, requirements, and budget ranges.",
+    details: [
+      "Swipe RIGHT (or click ♥) to match and trigger automated AI negotiation.",
+      "Swipe LEFT (or click ✕) to skip the gig.",
+      "Tap any skill pill at the top (e.g. Solidity, React, AI) to filter the catalogue instantly.",
+    ],
   },
   {
-    icon: "??",
-    title: "AI Negotiation",
+    icon: "🤖",
+    title: "3. AI Automated Negotiation",
     color: "from-amber-500 to-orange-500",
     badge: "Step 3",
-    content: "When you swipe right, your personal AI Agent auto-negotiates price & terms in the background using your hidden budget range (set in Settings). You never have to message anyone.",
+    tagline: "Autonomous dealmaking",
+    content:
+      "No more back-and-forth messaging. Your personal AI Agent negotiates price, timeline, and terms in the background using your confidential budget preferences.",
+    details: [
+      "Set your minimum acceptable payout and target ceiling in Settings.",
+      "AI agents exchange counter-offers in seconds and settle on a fair equilibrium.",
+      "You review and confirm the negotiated rate before locking funds.",
+    ],
   },
   {
-    icon: "?",
-    title: "Smart Contract Escrow",
+    icon: "🔒",
+    title: "4. Web3 Smart Contract Escrow",
     color: "from-emerald-500 to-green-500",
     badge: "Step 4",
-    content: "Once a deal is struck, funds are locked in a Web3 smart contract. The worker only gets paid when the job is marked complete � protecting both sides automatically.",
+    tagline: "Trustless decentralized payments",
+    content:
+      "Once an agreement is struck, the client's payment is locked into an audited Ethereum/EVM smart contract escrow (GigEscrow.sol).",
+    details: [
+      "Funds are safely held on-chain — no centralized middlemen.",
+      "Released to the freelancer's wallet immediately when the job is submitted and accepted.",
+      "MetaMask integration for one-click signing and deposits.",
+    ],
   },
   {
-    icon: "??",
-    title: "Earn Reputation SBTs",
+    icon: "🏆",
+    title: "5. Soulbound Reputation Tokens",
     color: "from-rose-500 to-pink-500",
     badge: "Step 5",
-    content: "After each completed job, the worker is minted a Soulbound Token (SBT) � an on-chain, non-transferable proof of reputation that lives in their wallet forever.",
+    tagline: "Verifiable on-chain resume",
+    content:
+      "Every completed gig mints a permanent Soulbound Token (ERC-5192) to the freelancer's wallet. It cannot be sold or transferred.",
+    details: [
+      "Builds an unforgeable cryptographic portfolio of completed projects.",
+      "View all earned SBTs, ratings, and stats on your Profile page.",
+      "Verifiable by clients globally without relying on centralized platform reviews.",
+    ],
   },
   {
-    icon: "??",
-    title: "Configure Your Agent",
-    color: "from-slate-400 to-zinc-500",
-    badge: "Tip",
-    content: "Go to Settings (gear icon in header) to set your hidden budget range. Your AI uses these numbers to negotiate without ever revealing them to the other party.",
+    icon: "⚙️",
+    title: "6. Settings & Hidden Budget",
+    color: "from-purple-500 to-pink-500",
+    badge: "Step 6",
+    tagline: "Personalize your experience",
+    content:
+      "Open Settings anytime via the gear icon in the top header. Tailor your agent's negotiation boundaries and access account controls.",
+    details: [
+      "Configure your confidential budget floor and ceiling.",
+      "Manage MetaMask wallet connection and address switching.",
+      "Logout or switch account roles at any time.",
+    ],
   },
 ];
 
 export default function StarterManual({ onClose }) {
   const [activeStep, setActiveStep] = useState(0);
 
+  const step = steps[activeStep];
+
   return (
-    <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-ink-950/60">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">??</span>
+    <div className="flex flex-col">
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent/20 text-accent-soft text-base">
+            📖
+          </div>
           <div>
-            <h4 className="text-sm font-bold text-white">Starter Manual</h4>
-            <p className="text-[10px] text-zinc-500">How SwipeGig works in 6 steps</p>
+            <h3 className="text-base font-bold text-white">Starter Manual</h3>
+            <p className="text-[11px] text-zinc-400">Everything you need to master SwipeGig</p>
           </div>
         </div>
-        <div className="text-[10px] font-medium text-zinc-600">
-          {activeStep + 1} / {steps.length}
-        </div>
+        <button
+          onClick={onClose}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+        >
+          ✕
+        </button>
       </div>
 
-      {/* Step Dots */}
-      <div className="flex justify-center gap-1.5 px-5 pt-4">
-        {steps.map((_, i) => (
+      {/* Step Tabs / Indicators */}
+      <div className="mt-4 flex items-center justify-between gap-1 overflow-x-auto pb-1">
+        {steps.map((s, idx) => (
           <button
-            key={i}
-            onClick={() => setActiveStep(i)}
-            className={`h-1.5 rounded-full transition-all duration-200 ${i === activeStep ? "w-6 bg-accent" : "w-1.5 bg-white/20 hover:bg-white/40"}`}
-          />
+            key={idx}
+            onClick={() => setActiveStep(idx)}
+            className={`flex flex-1 min-w-[40px] flex-col items-center gap-1 rounded-xl py-2 px-1 text-center transition ${
+              activeStep === idx
+                ? "bg-white/10 text-white font-bold ring-1 ring-accent"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+            }`}
+          >
+            <span className="text-sm">{s.icon}</span>
+            <span className="text-[10px] whitespace-nowrap">{s.badge}</span>
+          </button>
         ))}
       </div>
 
-      {/* Step Content */}
-      <div className="px-5 py-4 min-h-[180px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.22 }}
-            className="flex flex-col gap-3"
-          >
-            <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${steps[activeStep].color} text-2xl shadow-lg`}>
-              {steps[activeStep].icon}
+      {/* Active Step Card */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeStep}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="mt-4 rounded-2xl border border-white/10 bg-ink-950/70 p-5 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-2xl shadow-lg`}>
+              {step.icon}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                {steps[activeStep].badge}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-accent-soft">
+                {step.tagline}
               </span>
-              <h5 className="mt-0.5 text-base font-bold text-white">{steps[activeStep].title}</h5>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-400">
-                {steps[activeStep].content}
-              </p>
+              <h4 className="text-base font-bold text-white">{step.title}</h4>
             </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between border-t border-white/10 px-5 py-3">
+          <p className="mt-3.5 text-xs text-zinc-300 leading-relaxed">
+            {step.content}
+          </p>
+
+          <div className="mt-4 space-y-2 rounded-xl border border-white/5 bg-ink-900/60 p-3">
+            <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+              Key Highlights
+            </span>
+            {step.details.map((d, i) => (
+              <div key={i} className="flex items-start gap-2 text-[11px] text-zinc-300">
+                <span className="text-accent text-xs">✓</span>
+                <span>{d}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Buttons */}
+      <div className="mt-5 flex items-center justify-between gap-3">
         <button
           onClick={() => setActiveStep((p) => Math.max(0, p - 1))}
           disabled={activeStep === 0}
-          className="min-h-[36px] rounded-full border border-white/10 px-4 py-1.5 text-xs font-semibold text-zinc-400 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          className="flex-1 rounded-xl border border-white/10 bg-ink-800 py-2.5 text-xs font-semibold text-zinc-300 transition hover:bg-ink-700 disabled:opacity-40"
         >
-          ? Prev
+          ← Previous
         </button>
+
         {activeStep < steps.length - 1 ? (
           <button
             onClick={() => setActiveStep((p) => Math.min(steps.length - 1, p + 1))}
-            className="min-h-[36px] rounded-full bg-accent px-5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft"
+            className="flex-1 rounded-xl bg-accent py-2.5 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft"
           >
-            Next ?
+            Next Step →
           </button>
         ) : (
           <button
             onClick={onClose}
-            className="min-h-[36px] rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 px-5 py-1.5 text-xs font-semibold text-white shadow-lg transition hover:opacity-90"
+            className="flex-1 rounded-xl bg-emerald-500 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
           >
-            ?? Let's Go!
+            Got it, Let's Swipe! 🔥
           </button>
         )}
       </div>
