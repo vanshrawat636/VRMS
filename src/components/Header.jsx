@@ -8,21 +8,43 @@ export default function Header({
   onOpenSettings,
   onToggleProfile,
   wallet,
+  isLiveBackend = false,
+  onRefreshBackend,
 }) {
   return (
     <header className="mx-auto flex w-full max-w-[480px] items-center justify-between px-2 pt-6 sm:pt-8">
       {/* Brand logo & title */}
-      <button
-        onClick={() => onToggleProfile("feed")}
-        className="flex items-center gap-2.5 text-left transition hover:opacity-85"
-      >
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-black text-white shadow-md shadow-accent/20">
-          S
-        </div>
-        <span className="text-lg font-bold tracking-tight text-white">
-          Swipe<span className="text-accent-soft">Gig</span>
-        </span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onToggleProfile("feed")}
+          className="flex items-center gap-2 text-left transition hover:opacity-85"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-black text-white shadow-md shadow-accent/20">
+            S
+          </div>
+          <span className="text-lg font-bold tracking-tight text-white">
+            Swipe<span className="text-accent-soft">Gig</span>
+          </span>
+        </button>
+
+        {/* Backend Connectivity Status Badge */}
+        <button
+          onClick={onRefreshBackend}
+          title={
+            isLiveBackend
+              ? "Live Backend Connected (port 8000). Click to re-check."
+              : "In-Browser Demo Mode (FastAPI offline). Click to check for live backend."
+          }
+          className={`hidden xs:flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold transition ${
+            isLiveBackend
+              ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+              : "border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${isLiveBackend ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
+          <span>{isLiveBackend ? "Live API" : "Demo Mode"}</span>
+        </button>
+      </div>
 
       {/* Center/Right Nav Controls */}
       <div className="flex items-center gap-2">

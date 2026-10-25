@@ -46,27 +46,30 @@ export default function App() {
   // ── Gigs & Feed loading state ───────────────────────────────────────────────
   const [gigs, setGigs] = useState(MOCK_GIGS);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(null);
+  const [isLiveBackend, setIsLiveBackend] = useState(false);
 
   const fetchGigs = useCallback(async () => {
     setIsLoading(true);
-    setFetchError(null);
     try {
-      const res = await fetch(`${API_URL}/gigs`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(`${API_URL}/gigs`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         setGigs(data);
+        setIsLiveBackend(true);
       } else {
         setGigs(MOCK_GIGS);
+        setIsLiveBackend(false);
       }
     } catch (err) {
-      console.warn("Could not fetch live gigs from backend:", err);
-      setFetchError(
-        "Unable to reach the SwipeGig backend. Ensure the FastAPI server is running on port 8000 or use offline demo mode."
-      );
+      console.info("Backend offline or unreachable, seamlessly running in offline demo mode with local AI.");
+      setGigs(MOCK_GIGS);
+      setIsLiveBackend(false);
     } finally {
       setIsLoading(false);
     }
@@ -218,6 +221,8 @@ export default function App() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onToggleProfile={(view) => setCurrentView(view)}
         wallet={wallet}
+        isLiveBackend={isLiveBackend}
+        onRefreshBackend={fetchGigs}
       />
 
       {/* ── Main View Router ──────────────────────────────────────────────────── */}
@@ -246,40 +251,9 @@ export default function App() {
                 filteredCount={filteredGigs.length}
               />
 
-              {/* ── Feed Content: Loading Skeleton, Error State, or Card Feed ── */}
+              {/* ── Feed Content: Loading Skeleton or Card Feed ── */}
               {isLoading ? (
                 <CardSkeleton />
-              ) : fetchError ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mx-auto mt-4 flex h-[520px] w-full flex-col items-center justify-center rounded-3xl border border-dashed border-amber-500/30 bg-ink-900/60 p-8 text-center backdrop-blur-xl"
-                >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-3xl text-amber-400">
-                    🔌
-                  </div>
-                  <h2 className="mt-4 text-lg font-bold text-white">Backend Currently Unreachable</h2>
-                  <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
-                    {fetchError}
-                  </p>
-                  <div className="mt-6 flex flex-col gap-2.5 w-full">
-                    <button
-                      onClick={fetchGigs}
-                      className="min-h-[44px] rounded-full bg-accent px-6 py-2.5 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft"
-                    >
-                      🔄 Retry Connection
-                    </button>
-                    <button
-                      onClick={() => {
-                        setGigs(MOCK_GIGS);
-                        setFetchError(null);
-                      }}
-                      className="min-h-[44px] rounded-full border border-white/10 bg-ink-800 px-6 py-2.5 text-xs font-semibold text-zinc-300 transition hover:bg-ink-700 hover:text-white"
-                    >
-                      ⚡ Load Demo Gigs Offline
-                    </button>
-                  </div>
-                </motion.div>
               ) : empty ? (
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
