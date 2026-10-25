@@ -7,9 +7,9 @@ export default function CardStack({ gigs, direction, onSwipe, onSkillClick, acti
   const visible = gigs.slice(0, VISIBLE);
 
   return (
-    <div className="relative mx-auto h-[600px] w-full max-w-[400px]">
+    <div className="relative mx-auto h-[570px] sm:h-[610px] w-full max-w-[420px] sm:max-w-[450px]">
       <AnimatePresence custom={direction}>
-        {/* Render back-to-front so the top card is last in the DOM */}
+        {/* Render back-to-front so top card is last in the DOM */}
         {visible
           .map((gig, i) => ({ gig, i }))
           .reverse()

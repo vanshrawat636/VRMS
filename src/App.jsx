@@ -9,6 +9,7 @@ import NegotiationModal from "./components/NegotiationModal.jsx";
 import ProfileView from "./components/ProfileView.jsx";
 import SkillFilterBar from "./components/SkillFilterBar.jsx";
 import LandingPage from "./components/LandingPage.jsx";
+import MarketTelemetry from "./components/MarketTelemetry.jsx";
 import { useWallet } from "./hooks/useWallet.js";
 import { MOCK_GIGS, ALL_SKILLS } from "./data/gigs.js";
 import { track } from "./utils/analytics.js";
@@ -81,6 +82,7 @@ export default function App() {
 
   // ── Core swiping state ──────────────────────────────────────────────────────
   const [swipedIds, setSwipedIds] = useState(new Set());
+  const [swipedHistory, setSwipedHistory] = useState([]);
   const [matched, setMatched] = useState([]);
   const [skipped, setSkipped] = useState([]);
   const [direction, setDirection] = useState(1);
@@ -138,6 +140,7 @@ export default function App() {
       if (!top) return;
       setDirection(dir);
       setSwipedIds((prev) => new Set([...prev, top.id]));
+      setSwipedHistory((prev) => [...prev, { gig: top, dir }]);
 
       // Analytics event: gig_swiped
       track("gig_swiped", {
@@ -184,9 +187,50 @@ export default function App() {
     setSelectedCategory(null);
   }, []);
 
+  // ── Rewind / Undo Handler ───────────────────────────────────────────────────
+  const handleUndo = useCallback(() => {
+    if (swipedHistory.length === 0) return;
+    const last = swipedHistory[swipedHistory.length - 1];
+    setSwipedHistory((prev) => prev.slice(0, -1));
+    setSwipedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(last.gig.id);
+      return next;
+    });
+    if (last.dir === 1) {
+      setMatched((m) => m.filter((g) => g.id !== last.gig.id));
+    } else {
+      setSkipped((s) => s.filter((g) => g.id !== last.gig.id));
+    }
+  }, [swipedHistory]);
+
+  // ── Global Keyboard Shortcuts ────────────────────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't intercept when modal is open or when typing in input
+      if (isSettingsOpen || isNegotiationOpen || !user) return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleSwipe(-1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleSwipe(1);
+      } else if (e.key === "z" || e.key === "Z") {
+        e.preventDefault();
+        handleUndo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSwipe, handleUndo, isSettingsOpen, isNegotiationOpen, user]);
+
   // ── Reset ────────────────────────────────────────────────────────────────────
   const reset = () => {
     setSwipedIds(new Set());
+    setSwipedHistory([]);
     setMatched([]);
     setSkipped([]);
     setSelectedSkills([]);
@@ -211,7 +255,7 @@ export default function App() {
         {!user && <LandingPage key="landing" onEnter={handleEnter} />}
       </AnimatePresence>
 
-    <div className="flex min-h-full flex-col overflow-x-hidden px-3 sm:px-4 pb-10">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-grid-subtle">
       {/* ── Global Header ─────────────────────────────────────────────────────── */}
       <Header
         matched={matched.length}
@@ -223,6 +267,7 @@ export default function App() {
         wallet={wallet}
         isLiveBackend={isLiveBackend}
         onRefreshBackend={fetchGigs}
+        role={role}
       />
 
       {/* ── Main View Router ──────────────────────────────────────────────────── */}
@@ -238,18 +283,21 @@ export default function App() {
               onBackToFeed={() => setCurrentView("feed")}
             />
           ) : (
-            <div key="feed" className="flex flex-1 flex-col items-center w-full max-w-[400px] mx-auto">
-              {/* ── Skill & Category Filter Bar ─────────────────────────────── */}
-              <SkillFilterBar
-                skills={visibleSkills}
-                selectedSkills={selectedSkills}
-                selectedCategory={selectedCategory}
-                onToggleSkill={handleToggleSkill}
-                onToggleCategory={handleToggleCategory}
-                onClearAll={handleClearAll}
-                totalGigs={totalUnswiped}
-                filteredCount={filteredGigs.length}
-              />
+            <div key="feed" className="flex flex-1 flex-col items-center justify-center w-full max-w-7xl mx-auto px-3 sm:px-6">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 w-full py-2">
+                {/* Center Swiping Arena */}
+                <div className="flex flex-col items-center w-full max-w-[460px]">
+                  {/* ── Skill & Category Filter Bar ─────────────────────────────── */}
+                  <SkillFilterBar
+                    skills={visibleSkills}
+                    selectedSkills={selectedSkills}
+                    selectedCategory={selectedCategory}
+                    onToggleSkill={handleToggleSkill}
+                    onToggleCategory={handleToggleCategory}
+                    onClearAll={handleClearAll}
+                    totalGigs={totalUnswiped}
+                    filteredCount={filteredGigs.length}
+                  />
 
               {/* ── Feed Content: Loading Skeleton or Card Feed ── */}
               {isLoading ? (
@@ -313,15 +361,25 @@ export default function App() {
                   <ActionButtons
                     onSkip={() => handleSwipe(-1)}
                     onApply={() => handleSwipe(1)}
+                    onUndo={handleUndo}
+                    canUndo={swipedHistory.length > 0}
                     disabled={empty}
                   />
-                  <p className="mt-4 text-center text-xs text-zinc-600">
-                    Drag or use buttons · tap a skill tag to filter · ♥ = negotiate
-                  </p>
                 </>
               )}
             </div>
-          )}
+
+            {/* Right Desktop Protocol Telemetry Sidebar */}
+            <MarketTelemetry
+              matchedCount={matched.length}
+              completedCount={completedDeals.length}
+              userBudget={userBudget}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              wallet={wallet}
+            />
+          </div>
+        </div>
+      )}
         </AnimatePresence>
       </main>
 
