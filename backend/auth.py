@@ -128,6 +128,29 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    auth: Optional[HTTPAuthorizationCredentials] = Depends(security_bearer),
+) -> dict:
+    """
+    FastAPI dependency for endpoints that accept both authenticated and guest users.
+    Gracefully handles missing, expired, or synthetic demo tokens.
+    """
+    if not auth or not auth.credentials:
+        return {"id": "guest-user", "email": "guest@swipegig.xyz"}
+
+    try:
+        payload = decode_token(auth.credentials, expected_type="access")
+        email = payload.get("sub", "guest@swipegig.xyz")
+        user = USERS_DB.get(email)
+        if not user:
+            user_id = payload.get("uid", f"user-{uuid.uuid5(uuid.NAMESPACE_DNS, email).hex[:8]}")
+            user = {"id": user_id, "email": email}
+        return user
+    except Exception:
+        # Fall back to guest session instead of throwing 401
+        return {"id": "guest-user", "email": "guest@swipegig.xyz"}
+
+
 # Seed a demo user for testing/MVP
 _demo_email = "agent@swipegig.io"
 if _demo_email not in USERS_DB:

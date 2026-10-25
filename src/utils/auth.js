@@ -1,19 +1,24 @@
 // src/utils/auth.js
-// Client authentication helper managing JWT access & refresh tokens.
+// Client authentication helper managing JWT access & refresh tokens with automatic expiry validation.
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 let cachedToken = null;
 
 export async function getAuthToken() {
-  if (cachedToken) {
-    return cachedToken;
-  }
-
   const storedToken = localStorage.getItem("swipegig_access_token");
   if (storedToken) {
-    cachedToken = storedToken;
-    return storedToken;
+    try {
+      const payload = JSON.parse(atob(storedToken.split(".")[1]));
+      // Verify token hasn't expired (with 30-second buffer)
+      if (payload.exp && payload.exp * 1000 > Date.now() + 30000) {
+        cachedToken = storedToken;
+        return storedToken;
+      }
+    } catch {
+      // Malformed or expired token
+      localStorage.removeItem("swipegig_access_token");
+    }
   }
 
   // Obtain an agent/session token automatically from the backend
@@ -49,7 +54,7 @@ export async function getAuthToken() {
       return data.access_token;
     }
   } catch (err) {
-    console.warn("Could not acquire auth token from backend:", err);
+    console.info("Backend offline or auth unavailable, proceeding with guest/offline mode:", err);
   }
 
   return null;

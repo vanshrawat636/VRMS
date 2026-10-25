@@ -7,7 +7,7 @@ import {
   DEAL_ACTIONS,
   generateNegotiationPlan,
 } from "../state/dealMachine.js";
-import { getAuthToken } from "../utils/auth.js";
+import { getAuthToken, clearAuthToken } from "../utils/auth.js";
 import { track } from "../utils/analytics.js";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -163,27 +163,43 @@ export default function NegotiationModal({
     abortControllerRef.current = controller;
 
     try {
-      const token = await getAuthToken();
+      let token = await getAuthToken();
       const headers = { "Content-Type": "application/json" };
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_URL}/negotiations`, {
+      const bodyPayload = JSON.stringify({
+        gig_id: dealState.gig.id,
+        user_id: "user-anon",
+        min_budget: dealState.userBudget.min,
+        max_budget: dealState.userBudget.max,
+      });
+
+      let response = await fetch(`${API_URL}/negotiations`, {
         method: "POST",
         headers,
-        body: JSON.stringify({
-          gig_id: dealState.gig.id,
-          user_id: "user-anon",
-          min_budget: dealState.userBudget.min,
-          max_budget: dealState.userBudget.max,
-        }),
+        body: bodyPayload,
         signal: controller.signal,
       });
 
+      // If token expired, clear cache and retry once
+      if (response.status === 401) {
+        clearAuthToken();
+        token = await getAuthToken();
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+          response = await fetch(`${API_URL}/negotiations`, {
+            method: "POST",
+            headers,
+            body: bodyPayload,
+            signal: controller.signal,
+          });
+        }
+      }
+
       if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.detail || `FastAPI returned HTTP status ${response.status}`);
+        throw new Error(`FastAPI returned HTTP status ${response.status}`);
       }
 
       const data = await response.json();
@@ -264,24 +280,27 @@ export default function NegotiationModal({
       });
 
       es.onerror = (err) => {
-        // If stream error occurs before messages
-        console.warn("EventSource stream encountered a connection error:", err);
+        // If stream error occurs before messages, auto-switch to local simulation
+        console.warn("EventSource stream encountered a connection error, falling back to local simulation:", err);
         es.close();
         eventSourceRef.current = null;
         dispatch({
           type: DEAL_ACTIONS.SET_TYPING,
           payload: { isTyping: false },
         });
+        if (dealState.messages.length === 0) {
+          startLocalSimulation();
+        }
       };
     } catch (err) {
       if (err.name === "AbortError") return;
-      console.warn("FastAPI backend connection error:", err);
+      console.warn("FastAPI backend connection error, auto-starting autonomous local simulator:", err);
       setBackendLoading(false);
-      setBackendError(
-        `Unable to connect to the negotiation service at ${API_URL}. The server may be offline or starting up. You can retry connection or switch to the autonomous local simulator.`
-      );
+      setBackendError(null);
+      // Auto-fallback seamlessly without interrupting the user
+      startLocalSimulation();
     }
-  }, [dealState.gig, dealState.userBudget, dispatch]);
+  }, [dealState.gig, dealState.userBudget, dealState.messages.length, dispatch, startLocalSimulation]);
 
   // Trigger negotiation when modal opens in NEGOTIATING state with empty messages
   useEffect(() => {
