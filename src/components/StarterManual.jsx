@@ -9,7 +9,7 @@ const steps = [
     badge: "Step 1",
     tagline: "Client or Freelancer",
     content:
-      "When you first launch SwipeGig, pick whether you are hiring talent (Client) or finding work (Freelancer). Your role tailors the feed, negotiation prompts, and wallet escrow actions.",
+      "When you first launch Matchwork, pick whether you are hiring talent (Client) or finding work (Freelancer). Your role tailors the feed, negotiation prompts, and wallet escrow actions.",
     details: [
       "Clients post gig bounties and lock payment in escrow.",
       "Freelancers swipe right on jobs and earn Soulbound reputation tokens upon delivery.",
@@ -103,7 +103,7 @@ export default function StarterManual({ onClose }) {
           </div>
           <div>
             <h3 className="text-base font-bold text-white">Starter Manual</h3>
-            <p className="text-[11px] text-zinc-400">Everything you need to master SwipeGig</p>
+            <p className="text-[11px] text-zinc-400">Everything you need to master Matchwork</p>
           </div>
         </div>
         <button
@@ -122,7 +122,7 @@ export default function StarterManual({ onClose }) {
             onClick={() => setActiveStep(idx)}
             className={`flex flex-1 min-w-[40px] flex-col items-center gap-1 rounded-xl py-2 px-1 text-center transition ${
               activeStep === idx
-                ? "bg-white/10 text-white font-bold ring-1 ring-accent"
+                ? "bg-white/10 text-white font-bold ring-1 ring-white/20"
                 : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
             }`}
           >
@@ -143,7 +143,7 @@ export default function StarterManual({ onClose }) {
           className="mt-4 rounded-2xl border border-white/10 bg-ink-950/70 p-5 backdrop-blur-sm"
         >
           <div className="flex items-center gap-3">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-2xl shadow-lg`}>
+            <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 border border-white/10 text-2xl`}>
               {step.icon}
             </div>
             <div>

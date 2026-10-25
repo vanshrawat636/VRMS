@@ -32,28 +32,28 @@ export default function ProfileView({
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={onBackToFeed}
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-ink-900 px-4 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white"
+          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-4 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/20"
         >
           ← Back to Swipe Feed
         </button>
 
         <button
           onClick={onOpenSettings}
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-ink-900 px-4 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white"
+          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-4 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/20"
         >
-          ⚙️ Agent Settings
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Agent Settings
         </button>
       </div>
 
       {/* User Identity Card */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-ink-900/80 p-6 shadow-card backdrop-blur-xl sm:p-7">
-        <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-accent/15 blur-3xl" />
+      <div className="rounded-xl border border-white/10 bg-zinc-900 p-6 sm:p-7">
 
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-accent to-emerald-400 text-2xl font-black text-white shadow-lg shadow-accent/20">
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 border border-white/10 text-2xl font-black text-white">
               {user.name[0]}
-              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
+              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 border border-white/10 text-[10px] text-emerald-400">
                 ✓
               </span>
             </div>
@@ -76,7 +76,7 @@ export default function ProfileView({
           </div>
 
           {/* Quick hidden settings preview */}
-          <div className="rounded-2xl border border-white/5 bg-ink-950/70 p-3 sm:text-right">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-3 sm:text-right">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Hidden AI Parameters
             </span>
@@ -88,29 +88,29 @@ export default function ProfileView({
         </div>
 
         {/* Stats Row */}
-        <div className="mt-6 grid grid-cols-2 gap-3 border-t border-white/5 pt-5 sm:grid-cols-4">
-          <div className="rounded-2xl border border-white/5 bg-ink-950/50 p-3 text-center">
+        <div className="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-5 sm:grid-cols-4">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-3 text-center">
             <div className="text-[11px] text-zinc-500">Total Earned</div>
             <div className="mt-1 font-mono text-lg font-bold text-emerald-400">
               ${totalEarned.toLocaleString()}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/5 bg-ink-950/50 p-3 text-center">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-3 text-center">
             <div className="text-[11px] text-zinc-500">Deals Closed</div>
             <div className="mt-1 font-mono text-lg font-bold text-white">
               {completedDeals.length}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/5 bg-ink-950/50 p-3 text-center">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-3 text-center">
             <div className="text-[11px] text-zinc-500">SBT Tokens</div>
             <div className="mt-1 font-mono text-lg font-bold text-accent-soft">
               {completedDeals.length}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/5 bg-ink-950/50 p-3 text-center">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-3 text-center">
             <div className="text-[11px] text-zinc-500">Saved Gigs</div>
             <div className="mt-1 font-mono text-lg font-bold text-zinc-300">
               {savedGigs.length}
@@ -129,7 +129,7 @@ export default function ProfileView({
               : "border-transparent text-zinc-400 hover:text-white"
           }`}
         >
-          <span>🛡️ Soulbound Reputation</span>
+          <span className="flex items-center gap-1.5"><svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Soulbound Reputation</span>
           <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] text-accent-soft">
             {completedDeals.length}
           </span>
@@ -143,7 +143,7 @@ export default function ProfileView({
               : "border-transparent text-zinc-400 hover:text-white"
           }`}
         >
-          <span>💼 Completed Deals</span>
+          <span className="flex items-center gap-1.5"><svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> Completed Deals</span>
           <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-zinc-400">
             {completedDeals.length}
           </span>
@@ -157,7 +157,7 @@ export default function ProfileView({
               : "border-transparent text-zinc-400 hover:text-white"
           }`}
         >
-          <span>❤️ Saved Gigs</span>
+          <span className="flex items-center gap-1.5"><svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> Saved Gigs</span>
           <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-zinc-400">
             {savedGigs.length}
           </span>
@@ -174,8 +174,8 @@ export default function ProfileView({
           </div>
 
           {completedDeals.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-ink-900/40 p-8 text-center">
-              <div className="text-3xl">🛡️</div>
+            <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900 p-8 text-center">
+              <div className="flex justify-center"><svg className="h-8 w-8 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
               <h4 className="mt-2 text-sm font-bold text-white">No Soulbound Tokens yet</h4>
               <p className="mt-1 text-xs text-zinc-400">
                 Complete a gig negotiation and sign off on escrow to mint your first on-chain proof
@@ -183,7 +183,7 @@ export default function ProfileView({
               </p>
               <button
                 onClick={onBackToFeed}
-                className="mt-4 rounded-full bg-accent px-5 py-2 text-xs font-bold text-white transition hover:bg-accent-soft"
+                className="mt-4 min-h-[44px] rounded-full bg-accent px-5 py-2 text-xs font-bold text-white transition hover:bg-accent-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
               >
                 Explore Gigs
               </button>
@@ -195,7 +195,7 @@ export default function ProfileView({
                   key={deal.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="relative overflow-hidden rounded-2xl border border-white/10 bg-ink-900/80 p-5 shadow-lg backdrop-blur"
+                  className="rounded-xl border border-white/10 bg-zinc-900 p-5"
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -236,14 +236,14 @@ export default function ProfileView({
       {activeTab === "completed" && (
         <div className="mt-6 space-y-3">
           {completedDeals.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-ink-900/40 p-8 text-center text-xs text-zinc-400">
+            <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900 p-8 text-center text-xs text-zinc-400">
               No completed deals yet. Swipe right on a gig to trigger AI negotiation!
             </div>
           ) : (
             completedDeals.map((deal) => (
               <div
                 key={deal.id}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-ink-900/60 p-4"
+                className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-900 p-4"
               >
                 <div>
                   <h4 className="text-sm font-semibold text-white">{deal.gig.title}</h4>
@@ -272,21 +272,21 @@ export default function ProfileView({
       {activeTab === "saved" && (
         <div className="mt-6 space-y-3">
           {savedGigs.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-ink-900/40 p-8 text-center text-xs text-zinc-400">
+            <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900 p-8 text-center text-xs text-zinc-400">
               No saved gigs yet. Swipe right on gigs you find interesting!
             </div>
           ) : (
             savedGigs.map((gig) => (
               <div
                 key={gig.id}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-ink-900/60 p-4"
+                className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-900 p-4"
               >
                 <div>
                   <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-medium text-zinc-400">
                     {gig.category}
                   </span>
                   <h4 className="mt-1 text-sm font-semibold text-white">{gig.title}</h4>
-                  <p className="text-xs text-zinc-400">Client: {gig.buyer.name} · ⏱ {gig.timeline}</p>
+                  <p className="text-xs text-zinc-400">Client: {gig.buyer.name} · {gig.timeline}</p>
                 </div>
 
                 <div className="text-right">

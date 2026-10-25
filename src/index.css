@@ -9,26 +9,13 @@ body,
 }
 
 ::selection {
-  background-color: rgba(99, 102, 241, 0.3);
-  color: #e0e7ff;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 
 body {
-  @apply bg-ink-950 text-zinc-100 font-sans antialiased;
-  background-color: #08090d;
-  background-image:
-    radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 55%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
-  background-attachment: fixed;
-}
-
-/* Subtle modern grid pattern for desktop view */
-.bg-grid-subtle {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  @apply bg-zinc-950 text-zinc-100 font-sans antialiased;
+  background-color: #09090b;
 }
 
 /* Prevent text selection & native drag while swiping */
@@ -45,24 +32,4 @@ body {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-/* Glassmorphism helpers */
-.glass-panel {
-  background: rgba(15, 17, 23, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-panel-interactive {
-  background: rgba(15, 17, 23, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-panel-interactive:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(23, 26, 37, 0.85);
 }

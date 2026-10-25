@@ -129,7 +129,7 @@ export default function SettingsModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-ink-950/80 backdrop-blur-md"
+            className="absolute inset-0 bg-black/60"
           />
 
           {/* Modal Card */}
@@ -137,8 +137,8 @@ export default function SettingsModal({
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-ink-900/95 p-6 shadow-2xl backdrop-blur-xl sm:p-7"
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl border border-white/10 bg-zinc-900 p-6 sm:p-7"
           >
             {showManual ? (
               <StarterManual onClose={() => setShowManual(false)} />
@@ -148,10 +148,13 @@ export default function SettingsModal({
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/20 text-accent-soft">
-                        ⚙️
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-zinc-800 text-zinc-300">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
                       </div>
-                      <h3 className="text-lg font-bold text-white">Settings</h3>
+                      <h3 className="text-lg font-bold text-white tracking-tight">Settings</h3>
                     </div>
                     <p className="mt-1 text-xs text-zinc-400">
                       Agent budget · Starter Manual · Web3 & Account
@@ -160,16 +163,19 @@ export default function SettingsModal({
 
                   <button
                     onClick={onClose}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     aria-label="Close settings"
                   >
-                    ✕
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
                   </button>
                 </div>
 
                 {/* Account / User Card */}
                 {user && (
-                  <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-ink-950/60 p-3.5">
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-zinc-950/60 p-3.5">
                     <div className="flex items-center gap-3">
                       {user.avatar ? (
                         <img
@@ -178,14 +184,14 @@ export default function SettingsModal({
                           className="h-10 w-10 rounded-full border border-white/20 object-cover"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white font-bold text-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-white font-bold text-sm border border-white/10">
                           {user.name?.charAt(0) || "U"}
                         </div>
                       )}
                       <div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-bold text-white">{user.name}</span>
-                          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent-soft uppercase">
+                          <span className="rounded-full border border-white/10 bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-300 uppercase">
                             {role === "client" ? "Client" : "Freelancer"}
                           </span>
                         </div>
@@ -200,7 +206,7 @@ export default function SettingsModal({
                         onClose();
                       }}
                       id="btn-logout"
-                      className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20 hover:text-rose-200"
+                      className="min-h-[44px] sm:min-h-0 flex items-center rounded-xl border border-rose-500/30 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-rose-400 transition hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/40"
                       title="Log out of current session"
                     >
                       Log out
@@ -209,10 +215,15 @@ export default function SettingsModal({
                 )}
 
                 {/* Starter Manual Card Promo */}
-                <div className="mt-4 rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/15 to-purple-600/15 p-4">
+                <div className="mt-4 rounded-xl border border-white/10 bg-zinc-950/60 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-2xl">📖</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-zinc-800 text-zinc-300">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                      </span>
                       <div>
                         <h4 className="text-xs font-bold text-white">Starter Manual</h4>
                         <p className="text-[11px] text-zinc-400">
@@ -223,7 +234,7 @@ export default function SettingsModal({
                     <button
                       onClick={() => setShowManual(true)}
                       id="btn-open-starter-manual"
-                      className="rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-accent/20 transition hover:bg-accent-soft shrink-0"
+                      className="min-h-[44px] flex items-center rounded-xl border border-white/10 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-200 transition hover:bg-zinc-700 hover:text-white shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     >
                       Open Guide
                     </button>
@@ -231,7 +242,7 @@ export default function SettingsModal({
                 </div>
 
                 {/* Web3 / MetaMask Wallet Section */}
-                <div className="mt-4 rounded-2xl border border-white/10 bg-ink-950/60 p-4">
+                <div className="mt-4 rounded-xl border border-white/10 bg-zinc-950/60 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-1.5">
@@ -268,10 +279,10 @@ export default function SettingsModal({
                       className="flex items-center justify-between text-xs font-medium text-zinc-300"
                     >
                       <span>Minimum Floor (Acceptable)</span>
-                      <span className="font-mono text-xs text-accent-soft">USDC</span>
+                      <span className="font-mono text-xs text-zinc-400">USDC</span>
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-500">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-500">
                         $
                       </span>
                       <input
@@ -282,10 +293,10 @@ export default function SettingsModal({
                         step="50"
                         value={min}
                         onChange={(e) => handleMinChange(e.target.value)}
-                        className={`w-full rounded-xl border bg-ink-950/80 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
+                        className={`w-full rounded-xl border bg-zinc-950 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
                           minError || generalError
                             ? "border-rose-500/80 focus:border-rose-400"
-                            : "border-white/10 focus:border-accent"
+                            : "border-white/10 focus:border-brand-500"
                         }`}
                         placeholder="e.g. 1000"
                       />
@@ -302,10 +313,10 @@ export default function SettingsModal({
                       className="flex items-center justify-between text-xs font-medium text-zinc-300"
                     >
                       <span>Maximum Target (Ceiling)</span>
-                      <span className="font-mono text-xs text-accent-soft">USDC</span>
+                      <span className="font-mono text-xs text-zinc-400">USDC</span>
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-500">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-500">
                         $
                       </span>
                       <input
@@ -316,10 +327,10 @@ export default function SettingsModal({
                         step="50"
                         value={max}
                         onChange={(e) => handleMaxChange(e.target.value)}
-                        className={`w-full rounded-xl border bg-ink-950/80 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
+                        className={`w-full rounded-xl border bg-zinc-950 py-2.5 pl-8 pr-4 text-xs font-medium text-white transition focus:outline-none ${
                           maxError || generalError
                             ? "border-rose-500/80 focus:border-rose-400"
-                            : "border-white/10 focus:border-accent"
+                            : "border-white/10 focus:border-brand-500"
                         }`}
                         placeholder="e.g. 3000"
                       />
@@ -348,7 +359,7 @@ export default function SettingsModal({
                           setMin(500);
                           setMax(1500);
                         }}
-                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                        className="rounded-xl border border-white/10 bg-zinc-800/40 py-2 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                       >
                         $500 – $1.5k
                       </button>
@@ -358,7 +369,7 @@ export default function SettingsModal({
                           setMin(1000);
                           setMax(3000);
                         }}
-                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                        className="rounded-xl border border-white/10 bg-zinc-800/40 py-2 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                       >
                         $1k – $3k
                       </button>
@@ -368,7 +379,7 @@ export default function SettingsModal({
                           setMin(3000);
                           setMax(8000);
                         }}
-                        className="rounded-xl border border-white/5 bg-ink-950/60 py-1.5 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+                        className="rounded-xl border border-white/10 bg-zinc-800/40 py-2 text-center text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                       >
                         $3k – $8k
                       </button>
@@ -380,7 +391,7 @@ export default function SettingsModal({
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                      className="min-h-[44px] rounded-xl border border-white/10 px-4 py-2.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     >
                       Reset Defaults
                     </button>
@@ -388,13 +399,13 @@ export default function SettingsModal({
                       <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white"
+                        className="min-h-[44px] rounded-xl border border-white/10 px-4 py-2.5 text-xs font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="rounded-xl bg-accent px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-soft active:scale-[0.98]"
+                        className="min-h-[44px] rounded-xl bg-brand-500 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/40"
                       >
                         Save Settings
                       </button>

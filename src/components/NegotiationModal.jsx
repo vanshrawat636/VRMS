@@ -50,6 +50,7 @@ export default function NegotiationModal({
   const chatBottomRef = useRef(null);
   const eventSourceRef = useRef(null);
   const abortControllerRef = useRef(null);
+  const simulationTimersRef = useRef([]);  // tracks all local simulation timers for cleanup
 
   // Safe modal close ensuring all connections & timers are disposed
   const handleSafeClose = useCallback(() => {
@@ -61,6 +62,9 @@ export default function NegotiationModal({
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
+    // Clear any pending local simulation timers
+    simulationTimersRef.current.forEach(clearTimeout);
+    simulationTimersRef.current = [];
     setBackendLoading(false);
     onClose?.();
   }, [onClose]);
@@ -82,14 +86,27 @@ export default function NegotiationModal({
     setBackendLoading(false);
     setBackendError(null);
 
+    // Clear any previous simulation timers before starting fresh
+    simulationTimersRef.current.forEach(clearTimeout);
+    simulationTimersRef.current = [];
+
     const generatedPlan = generateNegotiationPlan(dealState.gig, dealState.userBudget);
     setPlan(generatedPlan);
     setActiveTab("negotiation");
 
     let currentStep = 0;
-    const cleanupTimers = [];
+    let cancelled = false;
+
+    const schedule = (fn, ms) => {
+      const id = setTimeout(() => {
+        if (!cancelled) fn();
+      }, ms);
+      simulationTimersRef.current.push(id);
+      return id;
+    };
 
     const runNextStep = () => {
+      if (cancelled) return;
       if (currentStep >= generatedPlan.steps.length) {
         if (generatedPlan.success) {
           dispatch({
@@ -117,7 +134,7 @@ export default function NegotiationModal({
         payload: { isTyping: true, speaker: step.senderLabel },
       });
 
-      const timer = setTimeout(() => {
+      schedule(() => {
         dispatch({
           type: DEAL_ACTIONS.ADD_MESSAGE,
           payload: {
@@ -129,17 +146,14 @@ export default function NegotiationModal({
             }),
           },
         });
-
         currentStep++;
-        const nextTimer = setTimeout(runNextStep, 700);
-        cleanupTimers.push(nextTimer);
-      }, 800);
-
-      cleanupTimers.push(timer);
+        schedule(runNextStep, 900);
+      }, 900);
     };
 
-    const initTimer = setTimeout(runNextStep, 300);
-    cleanupTimers.push(initTimer);
+    // Attach cancel fn so handleSafeClose can stop it
+    simulationTimersRef.current._cancel = () => { cancelled = true; };
+    schedule(runNextStep, 400);
   }, [dealState.gig, dealState.userBudget, dispatch]);
 
   // Connect to FastAPI backend via SSE
@@ -318,6 +332,8 @@ export default function NegotiationModal({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      simulationTimersRef.current.forEach(clearTimeout);
+      simulationTimersRef.current = [];
     };
   }, [isOpen, dealState.gig, dealState.status, startBackendNegotiation]);
 
@@ -452,12 +468,12 @@ export default function NegotiationModal({
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-black text-white">
-            SG
+            MW
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-accent-soft">
-                Autonomous AI Negotiation (Part 3 Real SSE)
+                Autonomous AI Negotiation
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
@@ -505,7 +521,7 @@ export default function NegotiationModal({
       {/* Main Content Area */}
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-hidden px-4 py-4 sm:px-6">
         {/* Deal Header Summary Card */}
-        <div className="mb-3 flex items-center justify-between rounded-2xl border border-white/10 bg-ink-900/60 p-3.5 backdrop-blur">
+        <div className="mb-3 flex items-center justify-between rounded-xl border border-white/10 bg-zinc-900 p-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/20 font-bold text-accent-soft">
               {gig.buyer.name[0]}
@@ -569,7 +585,9 @@ export default function NegotiationModal({
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <div className="relative flex h-12 w-12 items-center justify-center">
                   <span className="absolute h-full w-full rounded-full bg-accent/20 animate-ping" />
-                  <span className="h-8 w-8 rounded-full bg-accent/40 animate-pulse flex items-center justify-center text-sm font-bold text-white">⚡</span>
+                  <span className="h-8 w-8 rounded-full bg-zinc-800 border border-white/10 animate-pulse flex items-center justify-center">
+                    <svg className="h-4 w-4 text-accent-soft" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </span>
                 </div>
                 <h4 className="mt-3 text-sm font-semibold text-white">Connecting to AI Agents...</h4>
                 <p className="mt-1 text-xs text-zinc-400">Buyer AI & Seller AI are loading private budget parameters</p>
@@ -578,9 +596,9 @@ export default function NegotiationModal({
 
             {/* Backend Error State Banner */}
             {backendError && (
-              <div className="mb-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-amber-200">
+              <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-amber-200">
                 <div className="flex items-center gap-2 font-bold text-amber-300">
-                  <span>⚠️</span>
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   <span>Backend Offline Notice</span>
                 </div>
                 <p className="mt-1 text-zinc-300 leading-relaxed">{backendError}</p>
@@ -696,9 +714,9 @@ export default function NegotiationModal({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-center"
+                className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-center"
               >
-                <div className="text-xl">⚠️</div>
+                <div className="flex justify-center"><svg className="h-6 w-6 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                 <h4 className="mt-1 text-sm font-bold text-rose-300">
                   Negotiation Terminated – No Deal Reached
                 </h4>
@@ -716,10 +734,10 @@ export default function NegotiationModal({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-3 flex items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5"
+                className="mt-3 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">🤝</span>
+                  <svg className="h-5 w-5 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                   <div>
                     <div className="text-xs font-bold text-emerald-300">
                       Agreement Reached: {dealState.agreedPrice?.toLocaleString()} {gig.currency}
@@ -744,8 +762,7 @@ export default function NegotiationModal({
         {activeTab === "escrow" && (
           <div className="flex flex-1 flex-col overflow-y-auto rounded-2xl border border-white/10 bg-ink-900/40 p-4 sm:p-6">
             {/* Escrow Hero Banner */}
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-ink-900 to-ink-800 p-6 text-center shadow-card relative overflow-hidden">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
+            <div className="rounded-xl border border-white/10 bg-zinc-900 p-6 text-center">
 
               <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
                 <LockIcon className="h-3.5 w-3.5" />
@@ -854,7 +871,7 @@ export default function NegotiationModal({
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-5 rounded-2xl border border-white/10 bg-ink-900/60 p-4"
+                  className="mt-5 rounded-xl border border-white/10 bg-zinc-900 p-4"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -876,10 +893,10 @@ export default function NegotiationModal({
                     <button
                       onClick={() => dispatch({ type: DEAL_ACTIONS.APPROVE_BUYER })}
                       disabled={dealState.buyerApproved}
-                      className={`flex items-center justify-center gap-2 rounded-2xl border p-3.5 text-xs font-bold transition shadow-sm ${
+                      className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 text-xs font-bold transition ${
                         dealState.buyerApproved
                           ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
-                          : "border-white/15 bg-ink-800 text-white hover:border-emerald-500/40 hover:bg-ink-700"
+                          : "border-white/10 bg-zinc-900 text-white hover:border-emerald-500/40 hover:bg-zinc-800"
                       }`}
                     >
                       {dealState.buyerApproved ? (
@@ -889,7 +906,7 @@ export default function NegotiationModal({
                         </>
                       ) : (
                         <>
-                          <span>🏢</span>
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
                           <span>Mark as Done (Buyer)</span>
                         </>
                       )}
@@ -899,10 +916,10 @@ export default function NegotiationModal({
                     <button
                       onClick={() => dispatch({ type: DEAL_ACTIONS.APPROVE_SELLER })}
                       disabled={dealState.sellerApproved}
-                      className={`flex items-center justify-center gap-2 rounded-2xl border p-3.5 text-xs font-bold transition shadow-sm ${
+                      className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 text-xs font-bold transition ${
                         dealState.sellerApproved
                           ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
-                          : "border-white/15 bg-ink-800 text-white hover:border-accent/40 hover:bg-ink-700"
+                          : "border-white/10 bg-zinc-900 text-white hover:border-accent/40 hover:bg-zinc-800"
                       }`}
                     >
                       {dealState.sellerApproved ? (
@@ -912,7 +929,7 @@ export default function NegotiationModal({
                         </>
                       ) : (
                         <>
-                          <span>⚡</span>
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                           <span>Mark as Done (Seller)</span>
                         </>
                       )}
@@ -926,17 +943,9 @@ export default function NegotiationModal({
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="mt-5 rounded-3xl border border-emerald-500/40 bg-gradient-to-b from-emerald-500/10 via-ink-900 to-ink-950 p-6 text-center shadow-2xl relative overflow-hidden"
+                className="mt-5 rounded-xl border border-emerald-500/30 bg-zinc-900 p-6 text-center"
               >
-                {/* Radiant sweep pulse */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.4, 0] }}
-                  transition={{ repeat: Infinity, duration: 2.5 }}
-                  className="pointer-events-none absolute inset-0 bg-radial from-emerald-400/20 to-transparent"
-                />
-
-                <div className="text-4xl">🎉</div>
+                <div className="flex justify-center"><svg className="h-10 w-10 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                 <h3 className="mt-2 text-lg font-extrabold text-white sm:text-xl">
                   Funds Released & SBT Minted!
                 </h3>
@@ -945,7 +954,7 @@ export default function NegotiationModal({
                 </p>
 
                 {/* Soulbound Token Preview with Shine Animation */}
-                <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-ink-900/80 p-4">
+                <div className="mt-4 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-zinc-950 p-4">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-2">
                     On-Chain Reputation Minted (ReputationSBT.sol)
                   </span>
@@ -964,9 +973,9 @@ export default function NegotiationModal({
                 <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
                     onClick={onViewProfile}
-                    className="w-full sm:w-auto rounded-full bg-accent px-6 py-2.5 text-xs font-bold text-white transition hover:bg-accent-soft shadow-lg shadow-accent/25"
+                    className="w-full sm:w-auto min-h-[44px] rounded-full bg-accent px-6 py-2.5 text-xs font-bold text-white transition hover:bg-accent-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                   >
-                    View in Profile 👤
+                    View in Profile
                   </button>
                   <button
                     onClick={handleSafeClose}

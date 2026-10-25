@@ -129,7 +129,7 @@ export default function WalletButton({ wallet }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 6 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-white/10 bg-ink-900/95 p-4 shadow-2xl backdrop-blur-xl z-50"
+            className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-white/10 bg-zinc-900 p-4 shadow-xl z-50"
           >
             {/* Header info */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">

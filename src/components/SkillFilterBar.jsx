@@ -36,10 +36,10 @@ export default function SkillFilterBar({
         {/* Search Toggle Icon */}
         <button
           onClick={() => setShowSearch((p) => !p)}
-          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
             showSearch || searchQuery
               ? "border-brand-500 bg-brand-500/20 text-brand-300"
-              : "border-white/[0.08] bg-ink-900/60 text-zinc-400 hover:text-white"
+              : "border-white/10 bg-zinc-900 text-zinc-400 hover:text-white hover:border-white/20"
           }`}
           title="Search skills"
         >
@@ -52,10 +52,10 @@ export default function SkillFilterBar({
         {/* All Reset */}
         <button
           onClick={onClearAll}
-          className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition ${
+          className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
             !hasActiveFilter
-              ? "border-brand-500 bg-brand-500 text-white shadow-sm shadow-brand-500/30"
-              : "border-white/[0.08] bg-ink-900/60 text-zinc-400 hover:border-white/20 hover:text-white"
+              ? "border-brand-500 bg-brand-500 text-white"
+              : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-white"
           }`}
         >
           All Categories
@@ -67,10 +67,10 @@ export default function SkillFilterBar({
             <button
               key={cat}
               onClick={() => onToggleCategory(cat)}
-              className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition ${
+              className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 isActive
-                  ? "border-brand-400 bg-brand-500/20 text-brand-200 shadow-sm"
-                  : "border-white/[0.08] bg-ink-900/60 text-zinc-400 hover:border-white/20 hover:text-white"
+                  ? "border-brand-500 bg-brand-500/20 text-brand-300"
+                  : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-white"
               }`}
             >
               {cat}
@@ -94,18 +94,24 @@ export default function SkillFilterBar({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter by skill (e.g. Solidity, React, AI)..."
-                className="w-full rounded-xl border border-white/10 bg-ink-900/90 py-1.5 pl-8 pr-7 text-xs text-white placeholder-zinc-500 focus:border-brand-500 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 py-1.5 pl-8 pr-7 text-xs text-white placeholder-zinc-500 focus:border-brand-500 focus:outline-none"
                 autoFocus
               />
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">
-                🔍
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
               </span>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs"
                 >
-                  ✕
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
                 </button>
               )}
             </div>
@@ -125,13 +131,19 @@ export default function SkillFilterBar({
               id={`skill-pill-${skill}`}
               key={skill}
               onClick={() => onToggleSkill(skill)}
-              className={`shrink-0 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition ${
+              className={`shrink-0 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 active
-                  ? "border-brand-500 bg-brand-500 text-white shadow-sm shadow-brand-500/30"
-                  : "border-white/[0.08] bg-ink-900/60 text-zinc-400 hover:border-white/20 hover:text-zinc-200"
+                  ? "border-brand-500 bg-brand-500 text-white"
+                  : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-zinc-200"
               }`}
             >
-              {active && <span className="mr-1 text-[10px] font-bold">✓</span>}
+              {active && (
+                <span className="mr-1 inline-flex items-center">
+                  <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+              )}
               <span>{skill}</span>
             </button>
           );
@@ -145,11 +157,11 @@ export default function SkillFilterBar({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="flex items-center justify-between rounded-xl border border-brand-500/20 bg-brand-500/10 px-3 py-1.5 backdrop-blur-md"
+            className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-900 px-3 py-1.5"
           >
             <div className="flex flex-wrap items-center gap-1.5">
               {selectedCategory && (
-                <span className="flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-zinc-200">
+                <span className="flex items-center gap-1 rounded-md border border-white/10 bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-200">
                   <span>{selectedCategory}</span>
                   <button
                     onClick={() => onToggleCategory(selectedCategory)}
@@ -162,7 +174,7 @@ export default function SkillFilterBar({
               {selectedSkills.map((s) => (
                 <span
                   key={s}
-                  className="flex items-center gap-1 rounded-md border border-brand-500/30 bg-brand-500/20 px-2 py-0.5 text-[10px] font-semibold text-brand-300"
+                  className="flex items-center gap-1 rounded-md border border-brand-500/30 bg-brand-500/15 px-2 py-0.5 text-[10px] font-medium text-brand-300"
                 >
                   <span>{s}</span>
                   <button
@@ -176,7 +188,7 @@ export default function SkillFilterBar({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-semibold text-zinc-400">
+              <span className="text-[10px] font-medium text-zinc-400">
                 {filteredCount} of {totalGigs}
               </span>
               <button
